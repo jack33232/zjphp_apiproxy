@@ -1,0 +1,21 @@
+{
+    "name": "jack33232/zjphp_apiproxy",
+    "description": "ApiProxy for ZJPHP",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "jack33232",
+            "email": "jack33232@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "jack33232/zjphp": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "ZJPHP\\ApiProxy\\": ""
+        }
+    }
+}
