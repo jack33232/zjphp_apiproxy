@@ -4,7 +4,7 @@ namespace ZJPHP\ApiProxy\Service\Behavior;
 use ZJPHP\Base\ZJPHP;
 use ZJPHP\Base\Behavior;
 use ZJPHP\ApiProxy\Facade\ApiProxy;
-use ZJPHP\ApiProxy\Protocol\RequestInterface;
+use ZJPHP\ApiProxy\Service\Protocol\RequestInterface;
 use ZJPHP\Base\Kit\ArrayHelper;
 use ZJPHP\Facade\Security;
 use ZJPHP\Facade\ZJRedis;
