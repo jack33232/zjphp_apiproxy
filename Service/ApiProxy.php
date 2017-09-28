@@ -8,6 +8,7 @@ use ZJPHP\Base\Exception\InvalidCallException;
 use ZJPHP\Base\Exception\InvalidParamException;
 use ZJPHP\Base\Exception\DatabaseErrorException;
 use Klein\Exceptions\HttpException;
+use ZJPHP\Base\Kit\StringHelper;
 
 class ApiProxy extends Component
 {
@@ -25,7 +26,7 @@ class ApiProxy extends Component
         $service_setting['request_params'] = $request_params;
 
         $protocol = $service_setting['protocol'];
-        $request_name = 'api_proxy_' . strtolower($protocol) . '_request';
+        $request_name = __NAMESPACE__ . '\\Protocol\\' . StringHelper::studly($protocol);
 
         $definition = ['class' => $request_name] + $service_setting;
         return ZJPHP::createObject($definition);
