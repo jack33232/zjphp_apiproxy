@@ -12,9 +12,22 @@ use ZJPHP\Base\Exception\InvalidConfigException;
 
 class AuthHandler extends Behavior
 {
+    protected $jwtService = null;
+
+    public function init()
+    {
+        parent::init();
+        if (ZJPHP::$app->has('jwtSub')) {
+            $this->jwtService = ZJPHP::$app->get('jwtSub');
+        } elseif (ZJPHP::$app->has('jwtIssuer')) {
+            $this->jwtService = ZJPHP::$app->get('jwtIssuer');
+        } else {
+            throw new InvalidConfigException('This Auth Handler requires jwt service.');
+        }
+    }
+
     public function authByJwt(RequestInterface $request)
     {
-        $authentication = ZJPHP::$app->get('authentication');
         $auth_params = $request->getAuthParams();
         if (empty($auth_params['auth_system'])
             || empty($auth_params['audience'])
@@ -35,13 +48,12 @@ class AuthHandler extends Behavior
         }
 
         $request->setHeaders([
-            'Authorization' => $authentication->getJwtSchema() . ' ' . $jwt_info['jwt']
+            'Authorization' => $this->jwtService->getJwtSchema() . ' ' . $jwt_info['jwt']
         ]);
     }
 
     protected function getJwt($auth_params)
     {
-        $authentication = ZJPHP::$app->get('authentication');
         $jwt_cache_key = $this->getJwtCacheKey($auth_params['audience']);
         $redis_client = ZJRedis::connect();
         if ($redis_client->exists($jwt_cache_key)) {
@@ -54,13 +66,13 @@ class AuthHandler extends Behavior
                 'audience' => $auth_params['audience']
             ];
             
-            $data_for_jwt['signature'] = $authentication->sign($data_for_jwt, $auth_params['app_secret']);
+            $data_for_jwt['signature'] = $this->jwtService->sign($data_for_jwt, $auth_params['app_secret']);
 
             $jwt_data = ApiProxy::getRequest($auth_params['auth_system'], 'apply_jwt', [
                 'POST' => $data_for_jwt
             ])->send();
 
-            $jwt = $authentication->subVerifyJwt($jwt_data['jwt']);
+            $jwt = $this->jwtService->subVerifyJwt($jwt_data['jwt']);
 
             $expire_at = $jwt->getClaim('exp', strtotime('2047-06-30 23:59:59'));
             $data_to_cache = [
@@ -109,10 +121,9 @@ class AuthHandler extends Behavior
 
     protected function signData($request, $secret)
     {
-        $authentication = ZJPHP::$app->get('authentication');
         //Only Post Data will be signed
         $data_to_sign = $request->getRequestParams('POST');
-        $signature = $authentication->sign($data_to_sign, $secret);
+        $signature = $this->jwtService->sign($data_to_sign, $secret);
 
         $request->setRequestParams([
             'POST' => [
@@ -140,14 +151,13 @@ class AuthHandler extends Behavior
 
     public function authByRsaSign(RequestInterface $request)
     {
-        $authentication = ZJPHP::$app->get('authentication');
         $request_params = $request->getRequestParams();
         $auth_params = $request->getAuthParams();
         $algo_id = $auth_params['algo'] ?? 'RS256';
 
         // Only sign both get & post & url
         $data_to_sign = ArrayHelper::merge($request_params['GET'], $request_params['POST']);
-        $signature = $authentication->rsaSign($data_to_sign, $request->getTargetUrl(true), $algo_id);
+        $signature = $this->jwtService->rsaSign($data_to_sign, $request->getTargetUrl(true), $algo_id);
 
         $request->setRequestParams([
             'POST' => [
