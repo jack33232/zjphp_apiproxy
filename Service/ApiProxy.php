@@ -14,6 +14,11 @@ class ApiProxy extends Component
 {
     protected $apiMap = [];
 
+    public function hasService($system, $service_name)
+    {
+        return isset($this->apiMap[$system]['service_list'][$service_name]);
+    }
+
     public function getRequest($system, $service_name, $request_params)
     {
         if (!isset($this->apiMap[$system]['service_list'][$service_name])) {
