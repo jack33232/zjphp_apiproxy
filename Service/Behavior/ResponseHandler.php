@@ -3,7 +3,7 @@ namespace ZJPHP\ApiProxy\Service\Behavior;
 
 use ZJPHP\Base\ZJPHP;
 use ZJPHP\Base\Behavior;
-use ZJPHP\ApiProxy\Exception\ApiProxyException;
+use ZJPHP\ApiProxy\Base\Exception\ApiProxyException;
 
 class ResponseHandler extends Behavior
 {
