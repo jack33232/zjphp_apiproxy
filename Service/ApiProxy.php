@@ -31,7 +31,7 @@ class ApiProxy extends Component
         $service_setting['request_params'] = $request_params;
 
         $protocol = $service_setting['protocol'];
-        $request_name = __NAMESPACE__ . '\\Protocol\\' . StringHelper::studly($protocol);
+        $request_name = __NAMESPACE__ . '\\Protocol\\' . StringHelper::studly($protocol) . 'Protocol';
 
         $definition = ['class' => $request_name] + $service_setting;
         return ZJPHP::createObject($definition);

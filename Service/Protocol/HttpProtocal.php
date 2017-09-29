@@ -14,7 +14,7 @@ use GuzzleHttp\Cookie\CookieJar;
 use GuzzleHttp\Exception\RequestException;
 use Exception;
 
-class Http extends Component implements RequestInterface
+class HttpProtocal extends Component implements RequestInterface
 {
     private $_requestConfig = [];
 
