@@ -35,6 +35,8 @@ class Http extends Component implements RequestInterface
     protected $authParams = [];
     protected $stream = false;
 
+    protected $rawResponse = null;
+
     protected $allowedAuthType = [
         // TBD to add more types of auth
         'jwt',
@@ -156,9 +158,9 @@ class Http extends Component implements RequestInterface
             }
             $http_client = HttpClient::instance($config);
             $target_url = $this->getTargetUrl(true);
-            $response = $http_client->request($this->method, $target_url, $this->_requestConfig);
+            $this->rawResponse = $http_client->request($this->method, $target_url, $this->_requestConfig);
 
-            return $this->processResponse($response);
+            return $this->processResponse();
         } catch (Exception $e) {
             $reformed_exception = $this->processException($e);
             throw $reformed_exception;
@@ -170,8 +172,8 @@ class Http extends Component implements RequestInterface
         $e = $original_exception;
         if ($original_exception instanceof RequestException) {
             if ($original_exception->hasResponse()) {
-                $response = $original_exception->getResponse();
-                $response_content = $this->processResponse($response);
+                $this->rawResponse = $original_exception->getResponse();
+                $response_content = $this->processResponse();
                 $e = new ApiProxyException(
                     $response->getReasonPhrase(),
                     $response->getStatusCode(),
@@ -193,8 +195,9 @@ class Http extends Component implements RequestInterface
         }
     }
 
-    protected function processResponse($response)
+    protected function processResponse()
     {
+        $response = $this->rawResponse;
         $body = $response->getBody();
         $headers = $response->getHeaders();
         if ($response->hasHeader('Content-Type')) {
@@ -411,5 +414,10 @@ class Http extends Component implements RequestInterface
     public function setStream(bool $stream)
     {
         $this->stream = $stream;
+    }
+
+    public function getRawResponse()
+    {
+        return $this->rawResponse;
     }
 }
