@@ -43,7 +43,8 @@ class Http extends Component implements RequestInterface
 
     protected $allowedContentType = [
         'application/x-www-form-urlencoded',
-        'multipart/form-data'
+        'multipart/form-data',
+        'application/json'
     ];
 
     protected $allowedMethod = [
@@ -70,6 +71,7 @@ class Http extends Component implements RequestInterface
         }
 
         switch ($this->contentType) {
+            case 'application/json';
             case 'application/x-www-form-urlencoded':
                 if (!empty($this->postParams) && !ArrayHelper::isAssociative($this->postParams)) {
                     throw new InvalidParamException('Incorrect format of POST data.');
@@ -121,6 +123,11 @@ class Http extends Component implements RequestInterface
                     unset($this->_requestConfig['form_params']);
                     unset($this->_requestConfig['body']);
                     $this->_requestConfig['multipart'] = $this->postParams;
+                    break;
+                case 'application/json':
+                    unset($this->_requestConfig['multipart']);
+                    unset($this->_requestConfig['form_params']);
+                    $this->_requestConfig['body'] = json_encode($this->postParams, JSON_NUMERIC_CHECK);
                     break;
                 default:
                     unset($this->_requestConfig['multipart']);

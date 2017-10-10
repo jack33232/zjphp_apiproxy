@@ -86,9 +86,40 @@ class AuthHandler extends Behavior
             }
 
             $redis_client->hMSet($jwt_cache_key, $data_to_cache);
+            $redis_client->expireAt($jwt_cache_key, $expire_at - 60); // 1 min earlier expire
 
             return $data_to_cache;
         }
+    }
+
+    public function authByPresetToken(RequestInterface $request)
+    {
+        $auth_params = $request->getAuthParams();
+        if ((!empty($auth_params['type'])
+            && !in_array($auth_params['type'], ['GET', 'POST']))
+            || empty($auth_params['name'])
+            || empty($auth_params['value'])
+        ) {
+            throw new InvalidConfigException('The Auth parameters are invalid.');
+        }
+
+        $parameter_type = $auth_params['type'] ?? 'GET';
+        $parameters = [];
+
+        switch ($parameter_type) {
+            case 'POST':
+                $parameters['POST'] = [
+                    $auth_params['name'] => $auth_params['value']
+                ];
+                break;
+            case 'GET':
+            default:
+                $parameters['GET'] = [
+                    $auth_params['name'] => $auth_params['value']
+                ];
+                break;
+        }
+        $request->setRequestParams($parameters);
     }
 
     protected function processSessionKey($session_key, $app_secret)
