@@ -175,8 +175,8 @@ class Http extends Component implements RequestInterface
                 $this->rawResponse = $original_exception->getResponse();
                 $response_content = $this->processResponse();
                 $e = new ApiProxyException(
-                    $response->getReasonPhrase(),
-                    $response->getStatusCode(),
+                    $this->rawResponse->getReasonPhrase(),
+                    $this->rawResponse->getStatusCode(),
                     $original_exception,
                     $response_content
                 );
