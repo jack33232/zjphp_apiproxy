@@ -73,7 +73,7 @@ class Http extends Component implements RequestInterface
         }
 
         switch ($this->contentType) {
-            case 'application/json';
+            case 'application/json':
             case 'application/x-www-form-urlencoded':
                 if (!empty($this->postParams) && !ArrayHelper::isAssociative($this->postParams)) {
                     throw new InvalidParamException('Incorrect format of POST data.');
