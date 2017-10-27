@@ -40,7 +40,8 @@ class Http extends Component implements RequestInterface
     protected $allowedAuthType = [
         // TBD to add more types of auth
         'jwt',
-        'rsa_sign'
+        'rsa_sign',
+        'preset_token'
     ];
 
     protected $allowedContentType = [
